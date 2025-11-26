@@ -12,13 +12,13 @@ public class GoogleAuthenticator : IGoogleAuthenticator
         var authUrl = BuildAuthUrl(options);
 
         var code = GetOAuthCodeAsync(authUrl, options);
-        Console.WriteLine($"Code is: {code}");
+        // Console.WriteLine($"Code is: {code}");
 
         var tokens = await GetAccessTokenAsync(code, options);
 
-        Console.WriteLine($"AccessToken: {tokens.AccessToken}");
-        Console.WriteLine($"RefreshToken: {tokens.RefreshToken}");
-        Console.WriteLine($"ExpiresIn: {tokens.ExpiresIn}");
+        // Console.WriteLine($"AccessToken: {tokens.AccessToken}");
+        // Console.WriteLine($"RefreshToken: {tokens.RefreshToken}");
+        // Console.WriteLine($"ExpiresIn: {tokens.ExpiresIn}");
 
         return tokens;
     }
@@ -88,7 +88,8 @@ public class GoogleAuthenticator : IGoogleAuthenticator
             ["redirect_uri"] = options.RedirectUri,
             ["response_type"] = "code",
             ["scope"] = string.Join(" ", scopes), // add the scopes you need
-            ["access_type"] = "offline" // request a refresh token
+            ["access_type"] = "offline", // request a refresh token
+            ["prompt"] = "consent" // request a refresh token
         };
 
         var authUri = $"{baseAuthUri}?{string.Join("&", authUriQueryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"))}";
@@ -135,9 +136,10 @@ public class GoogleAuthenticator : IGoogleAuthenticator
     static async Task<TokenResponse> RefreshTokenAsync(string refreshToken, GoogleAuthOptions options)
     {
         const string tokenUri = "https://oauth2.googleapis.com/token";
+        Console.WriteLine($"Refresh token: {refreshToken}");
         var tokenRequestParams = new Dictionary<string, string>
         {
-            ["refrsh_token"] = refreshToken,
+            ["refresh_token"] = refreshToken,
             ["client_id"] = options.ClientId,
             ["client_secret"] = options.ClientSecret,
             //["redirect_uri"] = options.RedirectUri,
@@ -155,6 +157,7 @@ public class GoogleAuthenticator : IGoogleAuthenticator
 
         if (tokenResponse.IsSuccessStatusCode is false)
         {
+            Console.WriteLine(await tokenResponse.Content.ReadAsStringAsync());
             throw new ApplicationException($"Failed to get access token.");
         }
 

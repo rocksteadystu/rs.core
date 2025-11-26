@@ -1,13 +1,6 @@
-using System.ComponentModel.Design;
 using rs.core.google.Infrastructure;
-//using Microsoft.Extensions.DependencyInjection;
 
 namespace rs.core.google;
-
-public interface IGoogleTasksService
-{
-    
-}
 
 public class GoogleTasksService : IGoogleTasksService
 {
@@ -18,7 +11,7 @@ public class GoogleTasksService : IGoogleTasksService
         _googleServiceProvider = googleServiceProvider;
     }
 
-    public async Task GetLists()
+    public async Task<IEnumerable<GoogleTaskListInfo>> GetLists()
     {
         var serviceInitializer = await _googleServiceProvider.GetClientServiceInitializer();
 
@@ -26,14 +19,6 @@ public class GoogleTasksService : IGoogleTasksService
 
         var lists = await taskService.Tasklists.List().ExecuteAsync();
 
-        
+        return lists.Items.Select(item => new GoogleTaskListInfo(item.Id, item.Title));
     }
 }
-
-// public static class StartupExtensions
-// {
-//     public static IServiceCollection AddGoogleServices(this IServiceCollection services)
-//     {
-//         services.AddTr
-//     }
-// }
