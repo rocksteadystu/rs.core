@@ -11,6 +11,7 @@ public static class StartupExtensions
             .AddTransient<IGoogleServiceProvider, GoogleServiceProvider>()
             .AddTransient<IGoogleAuthenticator, GoogleAuthenticator>()
             .AddTransient<IGoogleAuthenticationService, GoogleAuthenticationService>()
-            .AddTransient<IGoogleTasksService, GoogleTasksService>();
+            .AddTransient<IGoogleTasksService, GoogleTasksService>()
+            .AddTransient<IGoogleDriveService, GoogleDriveService>();
     }
 }

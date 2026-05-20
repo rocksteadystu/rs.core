@@ -4,10 +4,9 @@ using rs.core.DataAccess;
 
 namespace rs.core.cli.DataAccess;
 
-public class LocalDataService : IDataService
+public class LocalDataService : ILocalDataService
 {
-
-    private string _basePath = "./";
+    private string? _basePath = null;
 
     public async Task<T> Get<T>() where T: new()
     {
@@ -22,10 +21,16 @@ public class LocalDataService : IDataService
         await File.WriteAllTextAsync(GetFilePath<T>(), text);
     }
 
+    public async Task SetBasePath(string basePath)
+    {
+        var basePathFile = "./path.config";
+        await File.WriteAllTextAsync(basePathFile, basePath);
+    }
+
     private string GetFilePath<T>()
     {
         var fileName = typeof(T).GetCustomAttribute<DataNameAttribute>()?.Name ?? typeof(T).Name;
-        var fullPath = Path.Combine(_basePath, $"{fileName}.json");
+        var fullPath = Path.Combine(GetBasePath(), $"{fileName}.json");
         if(!File.Exists(fullPath))
         {
             var file = File.Create(fullPath);
@@ -33,6 +38,25 @@ public class LocalDataService : IDataService
         }
         Console.WriteLine($"PATH: {fullPath}");
         return fullPath;
+    }
+
+    private string GetBasePath()
+    {
+        if (_basePath == null)
+        {
+            var basePathFile = "./path.config";
+            if (File.Exists(basePathFile))
+            {
+                var contents = File.ReadAllLines(basePathFile);
+                _basePath = contents.FirstOrDefault();
+            }
+
+            if (_basePath == null)
+            {
+                _basePath = "./";
+            }
+        }
+        return _basePath;
     }
 
 }

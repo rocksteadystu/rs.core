@@ -8,7 +8,8 @@ public static class StartupExtensions
 {
     public static IServiceCollection AddCoreCli(this IServiceCollection services)
     {
-        return services.AddTransient<IDataService, LocalDataService>()
+        return services.AddTransient<ILocalDataService, LocalDataService>()
+        .AddTransient<IDataService, LocalDataService>()
         .AddTransient<IAuthenticationInteractionService, CliAuthenticationInteractionService>();
     }
 }
